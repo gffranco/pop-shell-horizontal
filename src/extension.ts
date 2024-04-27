@@ -480,7 +480,7 @@ export class Ext extends Ecs.System<ExtEvent> {
             if (old) {
                 try {
                     GLib.source_remove(old);
-                } catch (_) {}
+                } catch (_) { }
             }
 
             const new_s = GLib.timeout_add(GLib.PRIORITY_LOW, 500, () => {
@@ -1258,7 +1258,7 @@ export class Ext extends Ecs.System<ExtEvent> {
 
                 this.register(Events.window_move(this, win, rect));
             } else {
-                win.move(this, rect, () => {});
+                win.move(this, rect, () => { });
                 // if the resulting dimensions of rect == next
                 if (rect.width == next_area.width && rect.height == next_area.height) {
                     win.meta.maximize(Meta.MaximizeFlags.BOTH);
@@ -1291,6 +1291,8 @@ export class Ext extends Ecs.System<ExtEvent> {
     move_workspace(direction: Meta.DisplayDirection) {
         const win = this.focus_window();
         if (!win) return;
+
+        log.log("move_workspace");
 
         /** Move a window between workspaces */
         const workspace_move = (direction: Meta.MotionDirection) => {
@@ -1363,13 +1365,13 @@ export class Ext extends Ecs.System<ExtEvent> {
 
             if (neighbor && neighbor.index() !== ws.index()) {
                 move_to_neighbor(neighbor);
-            } else if (direction === Meta.MotionDirection.DOWN && !last_window()) {
+            } else if ((direction === Meta.MotionDirection.DOWN || direction === Meta.MotionDirection.RIGHT) && !last_window()) {
                 if (this.settings.dynamic_workspaces()) {
                     neighbor = wom.append_new_workspace(false, global.get_current_time());
                 } else {
                     return;
                 }
-            } else if (direction === Meta.MotionDirection.UP && ws.index() === 0) {
+            } else if ((direction === Meta.MotionDirection.UP || direction === Meta.MotionDirection.LEFT) && ws.index() === 0) {
                 if (this.settings.dynamic_workspaces()) {
                     // Add a new workspace, to push everyone to free up the first one
                     wom.append_new_workspace(false, global.get_current_time());
@@ -1401,11 +1403,23 @@ export class Ext extends Ecs.System<ExtEvent> {
 
         switch (direction) {
             case Meta.DisplayDirection.DOWN:
+                log.log("move_workspace DOWN");
                 workspace_move(Meta.MotionDirection.DOWN);
                 break;
 
             case Meta.DisplayDirection.UP:
+                log.log("move_workspace UP");
                 workspace_move(Meta.MotionDirection.UP);
+                break;
+
+            case Meta.DisplayDirection.RIGHT:
+                log.log("move_workspace RIGHT");
+                workspace_move(Meta.MotionDirection.RIGHT)
+                break;
+
+            case Meta.DisplayDirection.LEFT:
+                log.log("move_workspace LEFT");
+                workspace_move(Meta.MotionDirection.LEFT)
                 break;
         }
 
@@ -1481,7 +1495,7 @@ export class Ext extends Ecs.System<ExtEvent> {
 
                         [area, monitor_attachment] =
                             (win.stack === null && attach_to.stack === null && is_sibling) ||
-                            (win.stack === null && is_sibling)
+                                (win.stack === null && is_sibling)
                                 ? [fork.area, false]
                                 : [attach_to.meta.get_frame_rect(), false];
                     } else {
@@ -1512,8 +1526,8 @@ export class Ext extends Ecs.System<ExtEvent> {
                                 ? [area.x, area.y, half_width, area.height]
                                 : [area.x + half_width, area.y, half_width, area.height]
                             : swap
-                            ? [area.x, area.y, area.width, half_height]
-                            : [area.x, area.y + half_height, area.width, half_height];
+                                ? [area.x, area.y, area.width, half_height]
+                                : [area.x, area.y + half_height, area.width, half_height];
 
                     this.overlay.x = new_area[0];
                     this.overlay.y = new_area[1];
@@ -1542,8 +1556,8 @@ export class Ext extends Ecs.System<ExtEvent> {
         this.current_style = this.settings.is_dark()
             ? Style.Dark
             : this.settings.is_high_contrast()
-            ? Style.HighContrast
-            : Style.Light;
+                ? Style.HighContrast
+                : Style.Light;
     }
 
     /** Handle window maximization notifications */
@@ -2292,7 +2306,7 @@ export class Ext extends Ecs.System<ExtEvent> {
         this.moved_by_mouse = false;
     }
 
-    update_display_configuration_before() {}
+    update_display_configuration_before() { }
 
     update_display_configuration(workareas_only: boolean) {
         if (!this.auto_tiler || sessionMode.isLocked) return;
@@ -2665,12 +2679,12 @@ let ext: Ext | null = null;
 let indicator: Indicator | null = null;
 
 declare global {
-  var popShellExtension: any;
+    var popShellExtension: any;
 }
 
 export default class PopShellExtension extends Extension {
     enable() {
-        globalThis.popShellExtension  = this;
+        globalThis.popShellExtension = this;
         log.info('enable');
 
         if (!ext) {
@@ -2845,7 +2859,7 @@ function _show_skip_taskbar_windows(ext: Ext) {
     // Handle the overview
     if (!default_isoverviewwindow_ws) {
         default_isoverviewwindow_ws = Workspace.prototype._isOverviewWindow;
-        Workspace.prototype._isOverviewWindow = function (win: any) {
+        Workspace.prototype._isOverviewWindow = function(win: any) {
             let meta_win = win;
             if (GNOME_VERSION?.startsWith('3.36')) meta_win = win.get_meta_window();
             return is_valid_minimize_to_tray(meta_win, ext) || default_isoverviewwindow_ws(win);
@@ -2859,7 +2873,7 @@ function _show_skip_taskbar_windows(ext: Ext) {
         if (!default_getcaption_workspace) {
             default_getcaption_workspace = Workspace.prototype._getCaption;
             // 3.36 _getCaption
-            Workspace.prototype._getCaption = function () {
+            Workspace.prototype._getCaption = function() {
                 let metaWindow = this._windowClone.metaWindow;
                 if (metaWindow.title) return metaWindow.title;
 
@@ -2873,7 +2887,7 @@ function _show_skip_taskbar_windows(ext: Ext) {
             default_getcaption_windowpreview = WindowPreview.prototype._getCaption;
             log.debug(`override workspace._getCaption`);
             // 3.38 _getCaption
-            WindowPreview.prototype._getCaption = function () {
+            WindowPreview.prototype._getCaption = function() {
                 if (this.metaWindow.title) return this.metaWindow.title;
 
                 let tracker = Shell.WindowTracker.get_default();
@@ -2886,7 +2900,7 @@ function _show_skip_taskbar_windows(ext: Ext) {
     // Handle the workspace thumbnail
     if (!default_isoverviewwindow_ws_thumbnail) {
         default_isoverviewwindow_ws_thumbnail = WorkspaceThumbnail.prototype._isOverviewWindow;
-        WorkspaceThumbnail.prototype._isOverviewWindow = function (win: any) {
+        WorkspaceThumbnail.prototype._isOverviewWindow = function(win: any) {
             let meta_win = win.get_meta_window();
             return is_valid_minimize_to_tray(meta_win, ext) || default_isoverviewwindow_ws_thumbnail(win);
         };
@@ -2951,7 +2965,7 @@ function _show_skip_taskbar_windows(ext: Ext) {
     // Handle switch-windows
     if (!default_getwindowlist_windowswitcher) {
         default_getwindowlist_windowswitcher = WindowSwitcherPopup.prototype._getWindowList;
-        WindowSwitcherPopup.prototype._getWindowList = function () {
+        WindowSwitcherPopup.prototype._getWindowList = function() {
             let workspace = null;
 
             if (this._settings.get_boolean('current-workspace-only')) {

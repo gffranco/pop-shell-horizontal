@@ -239,13 +239,25 @@
         <!-- Workspace Management -->
 
         <key type="as" name="pop-workspace-down">
-            <default><![CDATA[['<Super><Shift>Down','<Super><Shift>KP_Down','<Super><Shift>j']]]></default>
+            <!-- <default><![CDATA[['<Super><Shift>Down','<Super><Shift>KP_Down','<Super><Shift>j']]]></default> -->
+            <default><![CDATA[[]]]></default>
             <summary>Move window to the lower workspace</summary>
         </key>
 
         <key type="as" name="pop-workspace-up">
-            <default><![CDATA[['<Super><Shift>Up','<Super><Shift>KP_Up','<Super><Shift>k']]]></default>
+            <!-- <default><![CDATA[['<Super><Shift>Up','<Super><Shift>KP_Up','<Super><Shift>k']]]></default> -->
+            <default><![CDATA[[]]]></default>
             <summary>Move window to the upper workspace</summary>
+        </key>
+
+        <key type="as" name="pop-workspace-right">
+            <default><![CDATA[['<Super><Shift>Right', '<Super><Shift>KP_Right', '<Super><Shift>l']]]></default>
+            <summary>Move window to workspace on the right</summary>
+        </key>
+
+        <key type="as" name="pop-workspace-left">
+            <default><![CDATA[['<Super><Shift>Left', '<Super><Shift>KP_Left', '<Super><Shift>h']]]></default>
+            <summary>Move window to workspace on the left</summary>
         </key>
 
         <key type="as" name="pop-monitor-down">
@@ -259,12 +271,12 @@
         </key>
 
         <key type="as" name="pop-monitor-left">
-            <default><![CDATA[['<Super><Shift>Left','<Super><Shift>KP_Left','<Super><Shift>h']]]></default>
+            <default><![CDATA[['<Super><Shift><Primary>Left','<Super><Shift><Primary>KP_Left','<Super><Shift><Primary>h']]]></default>
             <summary>Move window to the leftward monitor</summary>
         </key>
 
         <key type="as" name="pop-monitor-right">
-            <default><![CDATA[['<Super><Shift>Right','<Super><Shift>KP_Right','<Super><Shift>l']]]></default>
+            <default><![CDATA[['<Super><Shift><Primary>Right','<Super><Shift><Primary>KP_Right','<Super><Shift><Primary>l']]]></default>
             <summary>Move window to the rightward monitor</summary>
         </key>
 
